@@ -1,0 +1,9 @@
+.git
+.gitignore
+README.md
+**/*.log
+/tmp
+bin
+obj
+node_modules
+.vscode

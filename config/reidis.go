@@ -8,10 +8,15 @@ import (
 )
 
 func InitRedis() {
+	addr := Appconfig.Redis.Addr
+	if addr == "" {
+		addr = "localhost:6379"
+	}
+
 	RedisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		DB:       0, //表示默认数据库
-		Password: "",
+		Addr:     addr,
+		DB:       Appconfig.Redis.DB, //表示默认数据库
+		Password: Appconfig.Redis.Password,
 	})
 
 	_, err := RedisClient.Ping().Result()

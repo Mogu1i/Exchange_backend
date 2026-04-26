@@ -3,6 +3,7 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -17,14 +18,24 @@ type Config struct {
 		MaxIdleConns int
 		MaxOpenCons  int
 	}
+	Redis struct {
+		Addr     string
+		Password string
+		DB       int
+	}
 }
 
 var Appconfig *Config
 
 func InitConfig() {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yml")
-	viper.AddConfigPath("./config")
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath != "" {
+		viper.SetConfigFile(configPath)
+	} else {
+		viper.SetConfigName("config")
+		viper.SetConfigType("yml")
+		viper.AddConfigPath("./config")
+	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config:%v", err)
