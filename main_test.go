@@ -23,5 +23,5 @@ func TestTaskControdl(t *testing.T) {
 }
 
 func TestPrint(t *testing.T) {
-	fmt.Println(
+	fmt.Println("print")
 }

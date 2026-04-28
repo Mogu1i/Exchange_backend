@@ -13,8 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var cacheKey = "article"
-
 func CreateArticle(ctx *gin.Context) {
 	var article models.Article
 	if err := ctx.ShouldBindJSON(&article); err != nil {
@@ -32,7 +30,7 @@ func CreateArticle(ctx *gin.Context) {
 		return
 	}
 
-	if err := global.RedisDB.Del(cacheKey).Err(); err != nil {
+	if err := global.RedisDB.Del(articleListCacheKey).Err(); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -50,7 +48,7 @@ func GetArticles(ctx *gin.Context) {
 		（在读取数据时, 只有在缓存未命中的情况下, 才会查询数据库并将结果写入缓存）
 	*/
 	//尝试在redis中寻找需要的文章数据
-	cacheData, err := global.RedisDB.Get(cacheKey).Result()
+	cacheData, err := global.RedisDB.Get(articleListCacheKey).Result()
 	//缓存中未查询到
 	if err == redis.Nil {
 		var articles []models.Article
@@ -66,7 +64,7 @@ func GetArticles(ctx *gin.Context) {
 			return
 		}
 		//将数据存入redis中
-		if err := global.RedisDB.Set(cacheKey, articalJSON, time.Minute*10).Err(); err != nil {
+		if err := global.RedisDB.Set(articleListCacheKey, articalJSON, time.Minute*10).Err(); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
